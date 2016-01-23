@@ -1,0 +1,96 @@
+<web-app>
+  <div class="row">
+    <form class="col s6">
+      <div class="row">
+        <div class="input-field col s6">
+          <input id="title" type="text" class="validate" onchange={updateTitle}>
+          <label for="title">Title</label>
+        </div>
+        <div class="input-field col s6">
+          <input id="pageCount" type="number" class="validate" value="{pageCount}" onchange={updatePages}>
+          <label for="pageCount">Pages</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div each={page, i in pages} class="input-field col s12">
+          
+          <input id="page_{i}" data-page-id={page.id} type="text" class="validate" onchange={updateUrl}>
+          <label for="page_{i}">Page #{page.id} link</label>
+        </div>
+      </div>
+
+      </div>
+    </form>
+
+    <div class="col s12">
+      <pre>
+        <virtual each={page in pages}>
+          {generate(page)}
+        </virtual>
+      </pre>
+    </div>
+
+  </div>
+
+  <style>
+    pre {
+      font-size: 10px;
+    }
+  </style>
+
+  <script>
+    var self = this;
+    self.title = "N/A";
+
+    var defaultPage = {
+      id: -1,
+      pageUrl: ""
+    };
+
+    self.generate = function(page) {
+      return '<li><a href="https://imehesz.firebaseapp.com/buzzcutter/index.html?pageUrl=' + page.pageUrl + '&title=' + escape(self.title) + '&pageNum=' + page.id + '">Page ' + page.id + '</a> - <input name="Q10' + page.id + 'Checkbox" type="checkbox" /></li>';
+    }
+
+    self.pageCount = 5;
+    self.pages = [];
+
+    self.updateTitle = function(el) {
+      if (el) self.title = $(el.target).val();
+      self.update();
+    }
+
+    self.updateUrl = function(el) {
+      var $el = $(el.target);
+      if ($el) {
+        var id = $el.attr("data-page-id");
+        var url = $el.val();
+
+        for (var i=0; i<self.pages.length; i++) {
+          var page = self.pages[i];
+          if (page && page.id==id) {
+            page.pageUrl = url;
+            console.log(self.pages);
+            break;
+          }
+        }
+      }
+    }
+
+    self.updatePages = function(el) {
+      self.pages = [];
+
+      if (el) {
+        self.pageCount = $(el.target).val();
+      }
+
+      for(var i=0; i<self.pageCount; i++) {
+        self.pages.push($.extend({}, defaultPage, {
+          id: i+1
+        }));
+      }
+    }
+
+    self.updatePages();
+  </script>
+</web-app>
