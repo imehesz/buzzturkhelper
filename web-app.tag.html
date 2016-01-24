@@ -7,7 +7,12 @@
           <label for="title">Title</label>
         </div>
         <div class="input-field col s6">
-          <input id="pageCount" type="number" class="validate" value="{pageCount}" onchange={updatePages}>
+          <input 
+            id="pageCount" 
+            type="number" 
+            class="validate" 
+            value="{pageCount}" 
+            onchange={updatePages}>
           <label for="pageCount">Pages</label>
         </div>
       </div>
@@ -15,7 +20,13 @@
       <div class="row">
         <div each={page, i in pages} class="input-field col s12">
           
-          <input id="page_{i}" data-page-id={page.id} type="text" class="validate" onchange={updateUrl}>
+          <input 
+            id="page_{i}" 
+            type="text"
+            class="validate"
+            data-page-id={page.id} 
+            value={page.pageUrl}
+            onchange={updateUrl}>
           <label for="page_{i}">Page #{page.id} link</label>
         </div>
       </div>
@@ -49,7 +60,7 @@
     };
 
     self.generate = function(page) {
-      return '<li><a href="https://imehesz.firebaseapp.com/buzzcutter/index.html?pageUrl=' + page.pageUrl + '&title=' + escape(self.title) + '&pageNum=' + page.id + '">Page ' + page.id + '</a> - <input name="Q10' + page.id + 'Checkbox" type="checkbox" /></li>';
+      return '<li><a href="https://imehesz.firebaseapp.com/buzzcutter/index.html?pageUrl=' + page.pageUrl + '&title=' + escape(self.title) + '&pageNum=' + page.id + '">Page #' + page.id + ' - ' + page.pageUrl + '</a> - <input name="Q10' + page.id + 'Checkbox" type="checkbox" /></li>';
     }
 
     self.pageCount = 5;
@@ -70,7 +81,6 @@
           var page = self.pages[i];
           if (page && page.id==id) {
             page.pageUrl = url;
-            console.log(self.pages);
             break;
           }
         }
@@ -78,6 +88,7 @@
     }
 
     self.updatePages = function(el) {
+      var tmpPages = self.pages;
       self.pages = [];
 
       if (el) {
@@ -85,8 +96,10 @@
       }
 
       for(var i=0; i<self.pageCount; i++) {
+        
         self.pages.push($.extend({}, defaultPage, {
-          id: i+1
+          id: i+1,
+          pageUrl: typeof tmpPages[i] != "undefined" ? tmpPages[i].pageUrl : ""
         }));
       }
     }
