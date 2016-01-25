@@ -54,10 +54,56 @@
     var self = this;
     self.title = "N/A";
 
+    var Util = {
+      DomUtil: {
+        getSearchParameters: function () {
+          var prmstr = window.location.search.substr(1);
+          return prmstr != null && prmstr != "" ? Util.DomUtil.transformToAssocArray(prmstr) : {};
+        },
+
+        transformToAssocArray: function(prmstr) {
+          var params = {};
+          var prmarr = prmstr.split("&");
+          for ( var i = 0; i < prmarr.length; i++) {
+            var tmparr = prmarr[i].split("=");
+            params[tmparr[0]] = tmparr[1];
+          }
+          return params;
+        }
+      }
+    };
+
+    var params = Util.DomUtil.getSearchParameters();
+
     var defaultPage = {
       id: -1,
       pageUrl: ""
     };
+
+    var init = function() {
+      if (params && params.prefill) {
+        var prefillStr = params.prefill[params.prefill.length-1] == "]" ? 
+              params.prefill : 
+              params.prefill.substr(0, params.prefill.length-1);
+
+        if (prefillStr) {
+          var prefillArr = JSON.parse(decodeURI(prefillStr));
+
+          if (prefillArr && prefillArr.length) {
+            self.pages = [];
+
+            for (var i=0; i<prefillArr.length; i++) {
+              self.pages.push($.extend({}, defaultPage, {
+                id: i+1,
+                pageUrl: prefillArr[i]
+              }));
+            }
+          }
+        }
+      }
+
+      self.updatePages();
+    }
 
     self.generate = function(page) {
       return '<li><a href="https://imehesz.firebaseapp.com/buzzcutter/index.html?pageUrl=' + page.pageUrl + '&title=' + escape(self.title) + '&pageNum=' + page.id + '">Page #' + page.id + ' - ' + page.pageUrl + '</a> - <input name="Q10' + page.id + 'Checkbox" type="checkbox" /></li>';
@@ -95,8 +141,8 @@
         self.pageCount = $(el.target).val();
       }
 
+      // TODO init()!?
       for(var i=0; i<self.pageCount; i++) {
-        
         self.pages.push($.extend({}, defaultPage, {
           id: i+1,
           pageUrl: typeof tmpPages[i] != "undefined" ? tmpPages[i].pageUrl : ""
@@ -104,6 +150,6 @@
       }
     }
 
-    self.updatePages();
+    init();
   </script>
 </web-app>
